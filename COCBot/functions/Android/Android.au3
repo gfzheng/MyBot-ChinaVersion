@@ -4144,14 +4144,15 @@ Func GetAndroidProcessPID($sPackage = Default, $bForeground = True, $iRetryCount
 		_ArrayAdd($aPkgList, $output, 0, " ", @LF, $ARRAYFILL_FORCE_STRING)
 
 		Local $CorrectSCHED = "0"
-		Switch $g_sAndroidGamePackage
-			Case $g_sAndroidGamePackage = "com.tencent.tmgp.supercell.clashofclans"
-				; scheduling policy : SCHED_BATCH = 3
-				$CorrectSCHED = "3"
-			Case Else
-				; scheduling policy : SCHED_NORMAL = 0
-				$CorrectSCHED = "0"
-		EndSwitch
+		; tencent fixed it now, no need to do this.
+		;~ Switch $g_sAndroidGamePackage
+		;~ 	Case $g_sAndroidGamePackage = "com.tencent.tmgp.supercell.clashofclans"
+		;~ 		; scheduling policy : SCHED_BATCH = 3
+		;~ 		$CorrectSCHED = "3"
+		;~ 	Case Else
+		;~ 		; scheduling policy : SCHED_NORMAL = 0
+		;~ 		$CorrectSCHED = "0"
+		;~ EndSwitch
 
 		For $i = 1 To UBound($aPkgList)
 			$iCols = _ArraySearch($aPkgList, "", 0, 0, 0, 0, 1, $i, True)
