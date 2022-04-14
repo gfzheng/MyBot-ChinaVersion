@@ -23,7 +23,7 @@ Func BuildingInfo($iXstart = -1, $iYstart = -1)
 		$iXstart = 242
 		$iYstart = 490 + $g_iBottomOffsetY
 
-		If $g_ChinaVersion Then
+		If $g_SimplifiedChinese Then
 			$iYstart += 5
 		EndIf
 
@@ -37,7 +37,7 @@ Func BuildingInfo($iXstart = -1, $iYstart = -1)
 	EndIf
 
 	; translate text
-	If $g_ChinaVersion Then $sBldgText = TranslateBuildingText($sBldgText)
+	If $g_SimplifiedChinese Then $sBldgText = TranslateBuildingText($sBldgText)
 	
 	If $g_bDebugSetlog Then SetDebugLog("Read building Name String = " & $sBldgText, $COLOR_DEBUG) ;debug
 	If StringInStr($sBldgText, "Cart") Then $sBldgText &= " (FakeLevel 100)"
@@ -81,25 +81,39 @@ Func BuildingInfo($iXstart = -1, $iYstart = -1)
 EndFunc   ;==>BuildingInfo
 
 Func TranslateBuildingText($sBldgText)
-	Local $aString, $sNewBldgText = ""
+	Local $aString, $aNumber, $sNewBldgText = ""
 	
 	SetLog("Building Text : " & $sBldgText)
+
+	$aString = StringRegExpReplace($sBldgText, "[^a-z]", "") ; extract lower case letters - name
+	$aNumber = StringRegExpReplace($sBldgText, "[^0-9]", "") ; extract numbers - level
 	
-	$aString = StringSplit($sBldgText, " ") ; Spilt the name and building level
+	SetLog("String : " & $aString)
+	SetLog("Number : " & $aNumber)
 
-	SetLog("Number of Strings :" & $aString[0])
-
+	If $aString <> "" Then
 		
-	If StringInStr($sBldgText, "lab") Then $sNewBldgText = "Laboratory (Level " & StringStripWS($aString[2], $STR_STRIPALL) & ")"
-	
-	If StringInStr($sBldgText, "castle") Then $sNewBldgText = "Clan Castle (Level " & StringStripWS($aString[2], $STR_STRIPALL) & ")"
-	
-	If StringInStr($sBldgText, "town") Then $sNewBldgText = "Town Hall (Level " & StringStripWS($aString[2], $STR_STRIPALL) & ")"
-	
-	If StringInStr($sBldgText, "mach") Then $sNewBldgText = "Battle Machine (Level " & StringStripWS($aString[2], $STR_STRIPALL) & ")"
-	
-	If StringInStr($sBldgText, "wall") Then $sNewBldgText = "Wall (Level " & StringStripWS($aString[2], $STR_STRIPALL) & ")"
-	
+		If $aString = "wang" Then $sNewBldgText = "Barbarian King (Level " & $aNumber & ")"
+		If $aString = "nuhuang" Then $sNewBldgText = "Archer Queen (Level " & $aNumber & ")"
+		If $aString = "huzhe" Then $sNewBldgText = "Grand Warden (Level " & $aNumber & ")"
+		If $aString = "zhanshen" Then $sNewBldgText = "Royal Champion (Level " & $aNumber & ")"
+
+		If $aString = "dabenying" Then $sNewBldgText = "Town Hall (Level " & $aNumber & ")"
+		If $aString = "yanshi" Then $sNewBldgText = "Laboratory (Level " & $aNumber & ")"
+		If $aString = "bao" Then $sNewBldgText = "Clan Castle (Level " & $aNumber & ")"	
+		If $aString = "zhanchongxiaowu" Then $sNewBldgText = "Pet House (Level " & $aNumber & ")"
+
+		If $aString = "qiang" Then $sNewBldgText = "Wall (Level " & $aNumber & ")"
+
+		If $aString = "zhanqi" Then $sNewBldgText = "Battle Machine (Level " & $aNumber & ")"
+		
+		
+		
+		If $aString = "shugan" Then $sNewBldgText = "Trunk"
+		If $aString = "baoxiang" Then $sNewBldgText = "Gem"
+		
+	EndIf
+
 	SetLog("New Building Text : " & $sNewBldgText)
 
 	Return $sNewBldgText
