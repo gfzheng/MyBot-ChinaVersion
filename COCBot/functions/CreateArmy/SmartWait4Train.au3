@@ -1,3 +1,20 @@
+Func SwitchProfile()
+	BotStop()
+	SetLog("going to close coc",$COLOR_ACTION)
+	If _Sleep(3000,True,False) Then Return
+	CloseCoC(False,False)
+	;AndroidHomeButton()
+	If _Sleep(3000,True,False) Then Return
+	;CloseCoC(False,False)
+	AndroidHomeButton()
+	If _Sleep(3000,True,False) Then Return
+	SetLog("going to swich next profile",$COLOR_ACTION)
+	switchNextProfile()
+	If _Sleep(3000,True,False) Then Return
+	SetLog("going to start bot again",$COLOR_ACTION)
+	BotStart()
+EndFunc   ;==>SwitchProfile
+
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........: SmartWait4Train
 ; Description ...: Will shutdown Android emulator & stop bot based on GUI configuration when waiting for troop training, spell cooking, or hero healing
@@ -260,6 +277,10 @@ Func SmartWait4Train($iTestSeconds = Default)
 	$iDiffTime = $iShieldTime - ($iTrainWaitTime) ; Find difference between train and shield time.
 	If $g_bDebugSetlogTrain Or $g_bDebugSetlog Then SetLog("Time Train:Shield:Diff " & ($iTrainWaitTime) & ":" & $iShieldTime & ":" & $iDiffTime, $COLOR_DEBUG)
 
+	Local $comboBoxArray = _GUICtrlComboBox_GetListArray($g_hCmbProfile)
+	Local $numberOfProfiles = UBound($comboBoxArray)-1
+	SetLog("number of profiles = " & $numberOfProfiles, $COLOR_DEBUG)
+
 	If ($iTrainWaitTime >= $MinimumTimeClose) Or $bTest Then ; are close times above minumum close time in GUI?
 		If $iShieldTime > 0 Then ; is shield time positive?
 			If $iDiffTime <= 0 Then ; is shield time less than total train time?
@@ -267,26 +288,35 @@ Func SmartWait4Train($iTestSeconds = Default)
 				SetLog("Smart wait while shield time = " & StringFormat("%.2f", $iShieldTime / 60) & " Minutes", $COLOR_INFO)
 				If $g_bNotifyTGEnable And $g_bNotifyAlertSmartWaitTime Then NotifyPushToTelegram($g_sNotifyOrigin & " : " & "%0A" & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_01", "Smart Wait While Shield Time = ") & StringFormat("%.2f", $iShieldTime / 60) & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_02", " Minutes") & "%0A" & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_03", "Wait For Troops Ready"))
 				If $bTest Then $iShieldTime = $iTestSeconds
-				UniversalCloseWaitOpenCoC($iShieldTime * 1000, "SmartWait4Train_", $StopEmulator, $bFullRestart, $bSuspendComputer)
-				$g_bRestart = True ; Set flag to exit idle loop to deal with potential user changes to GUI
-				ResetTrainTimeArray()
+				If $numberOfProfiles == 1 Then
+					UniversalCloseWaitOpenCoC($iShieldTime * 1000, "SmartWait4Train_", $StopEmulator, $bFullRestart, $bSuspendComputer)
+					$g_bRestart = True ; Set flag to exit idle loop to deal with potential user changes to GUI
+					ResetTrainTimeArray()
+				EndIf
 			Else ; close game  = $iTrainWaitTime because shield is larger than train time
 				SetLog("Smart wait train time = " & StringFormat("%.2f", $iTrainWaitTime / 60) & " Minutes", $COLOR_INFO)
 				If $g_bNotifyTGEnable And $g_bNotifyAlertSmartWaitTime Then NotifyPushToTelegram($g_sNotifyOrigin & " : " & "%0A" & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_04", "Smart Wait Train Time = ") & StringFormat("%.2f", $iTrainWaitTime / 60) & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_02", " Minutes") & "%0A" & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_03", "Wait For Troops Ready"))
 				If $bTest Then $iTrainWaitTime = $iTestSeconds
-				UniversalCloseWaitOpenCoC($iTrainWaitTime * 1000, "SmartWait4Train_", $StopEmulator, $bFullRestart, $bSuspendComputer)
-				$g_bRestart = True ; Set flag to exit idle loop to deal with potential user changes to GUI
-				ResetTrainTimeArray()
+				If $numberOfProfiles == 1 Then
+					UniversalCloseWaitOpenCoC($iTrainWaitTime * 1000, "SmartWait4Train_", $StopEmulator, $bFullRestart, $bSuspendComputer)
+					$g_bRestart = True ; Set flag to exit idle loop to deal with potential user changes to GUI
+					ResetTrainTimeArray()
+				EndIf
 			EndIf
 			; if shield is zero, or not available, then check all 3 close without shield flags
+			If $numberOfProfiles > 1 Then SwitchProfile()
 		ElseIf ($g_bCloseWithoutShield And $g_aiTimeTrain[0] > 0) Or ($ichkCloseWaitSpell = 1 And $g_aiTimeTrain[1] > 0) Or ($ichkCloseWaitHero = 1 And $g_aiTimeTrain[2] > 0) Then
 			;when no shield close game for $iTrainWaitTime time as determined above
 			SetLog("Smart Wait time = " & StringFormat("%.2f", $iTrainWaitTime / 60) & " Minutes", $COLOR_INFO)
 			If $g_bNotifyTGEnable And $g_bNotifyAlertSmartWaitTime Then NotifyPushToTelegram($g_sNotifyOrigin & " : " & "%0A" & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_05", "Smart Wait Time = ") & StringFormat("%.2f", $iTrainWaitTime / 60) & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_02", " Minutes") & "%0A" & GetTranslatedFileIni("MBR Func_Notify", "Smart-Wait-Time_Info_03", "Wait For Troops Ready"))
 				If $bTest Then $iTrainWaitTime = $iTestSeconds
-			UniversalCloseWaitOpenCoC($iTrainWaitTime * 1000, "SmartWait4TrainNoShield_", $StopEmulator, $bFullRestart, $bSuspendComputer)
-			$g_bRestart = True ; Set flag to exit idle loop to deal with potential user changes to GUI
-			ResetTrainTimeArray()
+			If $numberOfProfiles <= 1 Then
+				UniversalCloseWaitOpenCoC($iTrainWaitTime * 1000, "SmartWait4TrainNoShield_", $StopEmulator, $bFullRestart, $bSuspendComputer)
+				$g_bRestart = True ; Set flag to exit idle loop to deal with potential user changes to GUI
+				ResetTrainTimeArray()
+			Else
+				SwitchProfile()
+			EndIf
 		Else
 			If $g_bDebugSetlogTrain Or $g_bDebugSetlog Then SetLog("$ichkCloseWaitSpell=" & $ichkCloseWaitSpell & ", $g_aiTimeTrain[1]=" & $g_aiTimeTrain[1], $COLOR_DEBUG)
 			If $g_bDebugSetlogTrain Or $g_bDebugSetlog Then SetLog("$ichkCloseWaitHero=" & $ichkCloseWaitHero & ", $g_aiTimeTrain[2]=" & $g_aiTimeTrain[2], $COLOR_DEBUG)

@@ -221,6 +221,31 @@ Func selectProfile($sProfile = Default)
 	Return FuncReturn(True)
 EndFunc   ;==>selectProfile
 
+Func switchNextProfile()
+	Local $comboBoxArray = _GUICtrlComboBox_GetListArray($g_hCmbProfile)
+	SetLog("current profile:" & $g_sProfileCurrentName & ", #Profile = " & UBound($comboBoxArray), $COLOR_DEBUG)
+	Local $iNext = 0
+	For $i = 0 To UBound($comboBoxArray) - 1
+	    If $comboBoxArray[$i] = $g_sProfileCurrentName Then
+			$iNext = $i + 1
+			If $i + 1 > UBound($comboBoxArray) - 1 Then
+				$iNext = 1
+			EndIf
+			ExitLoop
+		EndIf
+	Next
+	If $iNext > 0 Then
+		SetLog("select next profile: " & $comboBoxArray[$iNext], $COLOR_DEBUG)		
+		_GUICtrlComboBox_SetCurSel($g_hCmbProfile, _GUICtrlComboBox_FindStringExact($g_hCmbProfile, $comboBoxArray[$iNext]))
+		cmbProfile()
+		;DisableGUI_AfterLoadNewProfile()
+		;_GUICtrlComboBox_SelectString($g_hCmbProfile, $comboBoxArray[$iNext])
+	    ;LoadProfile(False)
+		;selectProfile($comboBoxArray[$iNext])
+		SetSwitchAccLog("Switched to Acc [" & $comboBoxArray[$iNext] & "]", $COLOR_SUCCESS)
+	EndIf
+EndFunc   ;==>switchNextProfile()
+
 Func aquireProfileMutex($sProfile = Default, $bReturnOnlyMutex = Default, $bShowMsgBox = False)
 	If $sProfile = Default Then $sProfile = $g_sProfileCurrentName
 	If $bReturnOnlyMutex = Default Then $bReturnOnlyMutex = False
