@@ -19,12 +19,12 @@ Func AttackBB($iNumberOfAttacks = 0)
 	If Not $g_bChkEnableBBAttack And $iNumberOfAttacks = 0 Then Return False
 
 	; active CG skip regular attacks
-	If Not $g_bClanGamesCompleted And $g_IsClanGamesActive And $iNumberOfAttacks = 0 Then
-		SetLog("Clan Games Active pausing regular BB Attacks")
-		Return False
-	Else
-		SetLog("Proceeding with regular BB Attacks")
-	EndIf
+	;If Not $g_bClanGamesCompleted And $g_IsClanGamesActive And $iNumberOfAttacks = 0 Then 
+	;	SetLog("Clan Games Active pausing regular BB Attacks")
+	;	Return False 
+	;Else
+	SetLog("Proceeding with regular BB Attacks")
+	;EndIf
 
 	SetLog("$g_bChkBBStorageFull: " & $g_bChkBBStorageFull)
 	SetLog("$g_bChkBBTrophyRange: " & $g_bChkBBTrophyRange)
