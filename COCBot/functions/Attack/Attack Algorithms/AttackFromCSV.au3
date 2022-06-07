@@ -1,12 +1,12 @@
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........:
-; Description ...: This file contens the attack algorithm SCRIPTED
+; Description ...: This file contains the attack algorithm SCRIPTED
 ; Syntax ........:
 ; Parameters ....: None
 ; Return values .: None
 ; Author ........: Sardo (2016)
-; Modified ......: CodeSlinger69 (01-2017)
-; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2019
+; Modified ......: CodeSlinger69 (01-2017) GrumpyHog (05-2022)
+; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2022
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
@@ -37,50 +37,27 @@ Global $g_aiPixelBottomLeftDOWNDropLine
 Global $g_aiPixelBottomRightUPDropLine
 Global $g_aiPixelBottomRightDOWNDropLine
 
-Local $DeployableLRTB = [0, $g_iGAME_WIDTH - 1, 0, 626]
+Global $g_aiDeployableLRTB = [0, $g_iGAME_WIDTH - 1, 0, 626] ; used by another isInsideDiamondRedArea
 
-;Local $DiamandAdjX = -25
-;Local $DiamandAdjY = -22
-;Local $OuterDiamondLeft = 26 - $DiamandAdjX, $OuterDiamondRight = 847 + $DiamandAdjX, $OuterDiamondTop = 26 - $DiamandAdjY, $OuterDiamondBottom = 644 + $DiamandAdjY ; set the diamond shape based on reference village
-;Local $DiamondMiddleX = ($OuterDiamondLeft + $OuterDiamondRight) / 2
-;Local $DiamondMiddleY = ($OuterDiamondTop + $OuterDiamondBottom) / 2
-;Local $InnerDiamandDiffX = 60 + $DiamandAdjX ; set the diamond shape based on reference village
-;Local $InnerDiamandDiffY = 45 + $DiamandAdjY ; set the diamond shape based on reference village
+Func ConvertInternalExternArea()
+	; set the diamond shape based on reference village
+	Local $InnerDiamondLeft = $g_afRefVillage[$g_iTree][1]
+	Local $InnerDiamondRight = $g_afRefVillage[$g_iTree][2]
+	Local $InnerDiamondTop = $g_afRefVillage[$g_iTree][3]
+	Local $InnerDiamondBottom = $g_afRefVillage[$g_iTree][4]
 
-; mybotrun
-;Local $DiamandAdjX = -25
-;Local $DiamandAdjY = -22
-;Local $OuterDiamondLeft = 10 - $DiamandAdjX, $OuterDiamondRight = 850 + $DiamandAdjX, $OuterDiamondTop = 10 - $DiamandAdjY, $OuterDiamondBottom = 655 + $DiamandAdjY ; set the diamond shape based on reference village
-;Local $DiamondMiddleX = ($OuterDiamondLeft + $OuterDiamondRight) / 2
-;Local $DiamondMiddleY = ($OuterDiamondTop + $OuterDiamondBottom) / 2
-;Local $InnerDiamandDiffX = 60 + $DiamandAdjX ; set the diamond shape based on reference village
-;Local $InnerDiamandDiffY = 45 + $DiamandAdjY ; set the diamond shape based on reference village
+	Local $DiamandAdjX = 30
+	Local $DiamandAdjY = 30
+	
+	Local $OuterDiamondLeft =  $InnerDiamondLeft - $DiamandAdjX 
+	Local $OuterDiamondRight = $InnerDiamondRight + $DiamandAdjX 
+	Local $OuterDiamondTop =  $InnerDiamondTop - $DiamandAdjY
+	Local $OuterDiamondBottom = $InnerDiamondBottom + $DiamandAdjY
 
-; v7.7.7
-;Local $DiamandAdjX = -28
-;Local $DiamandAdjY = -24
-;Local $OuterDiamondLeft = -18 - $DiamandAdjX, $OuterDiamondRight = 857 + $DiamandAdjX, $OuterDiamondTop = 20 - $DiamandAdjY, $OuterDiamondBottom = 679 + $DiamandAdjY ; set the diamond shape based on reference village
-;Local $DiamondMiddleX = ($OuterDiamondLeft + $OuterDiamondRight) / 2
-;Local $DiamondMiddleY = ($OuterDiamondTop + $OuterDiamondBottom) / 2
-;Local $InnerDiamandDiffX = 55 + $DiamandAdjX ; set the diamond shape based on reference village
-;Local $InnerDiamandDiffY = 47 + $DiamandAdjY ; set the diamond shape based on reference village
+	Local $DiamondMiddleX = ($OuterDiamondLeft + $OuterDiamondRight) / 2
+	Local $DiamondMiddleY = ($OuterDiamondTop + $OuterDiamondBottom) / 2
 
-Local $DiamandAdjX = -25
-Local $DiamandAdjY = -22
-; set the diamond shape based on reference village
-Local $OuterDiamondLeft = 10 - $DiamandAdjX, $OuterDiamondRight = 850 + $DiamandAdjX, $OuterDiamondTop = 15 - $DiamandAdjY, $OuterDiamondBottom = 650 + $DiamandAdjY
-Local $DiamondMiddleX = ($OuterDiamondLeft + $OuterDiamondRight) / 2
-Local $DiamondMiddleY = ($OuterDiamondTop + $OuterDiamondBottom) / 2
-Local $InnerDiamandDiffX = 60 + $DiamandAdjX ; set the diamond shape based on reference village
-Local $InnerDiamandDiffY = 45 + $DiamandAdjY ; set the diamond shape based on reference village
-
-
-
-
-
-Local $InnerDiamondLeft = $OuterDiamondLeft + $InnerDiamandDiffX, $InnerDiamondRight = $OuterDiamondRight - $InnerDiamandDiffX, $InnerDiamondTop = $OuterDiamondTop + $InnerDiamandDiffY, $InnerDiamondBottom = $OuterDiamondBottom - $InnerDiamandDiffY
-
-Local $ExternalAreaRef[8][3] = [ _
+	Local $ExternalAreaRef[8][3] = [ _
 		[$OuterDiamondLeft, $DiamondMiddleY, "LEFT"], _
 		[$OuterDiamondRight, $DiamondMiddleY, "RIGHT"], _
 		[$DiamondMiddleX, $OuterDiamondTop, "TOP"], _
@@ -91,7 +68,7 @@ Local $ExternalAreaRef[8][3] = [ _
 		[$DiamondMiddleX + ($OuterDiamondRight - $DiamondMiddleX) / 2, $DiamondMiddleY + ($OuterDiamondBottom - $DiamondMiddleY) / 2, "BOTTOM-RIGHT"] _
 		]
 
-Local $InternalAreaRef[8][3] = [ _
+	Local $InternalAreaRef[8][3] = [ _
 		[$InnerDiamondLeft, $DiamondMiddleY, "LEFT"], _
 		[$InnerDiamondRight, $DiamondMiddleY, "RIGHT"], _
 		[$DiamondMiddleX, $InnerDiamondTop, "TOP"], _
@@ -102,9 +79,6 @@ Local $InternalAreaRef[8][3] = [ _
 		[$DiamondMiddleX + ($InnerDiamondRight - $DiamondMiddleX) / 2, $DiamondMiddleY + ($InnerDiamondBottom - $DiamondMiddleY) / 2, "BOTTOM-RIGHT"] _
 		]
 
-ConvertInternalExternArea() ; initial layout so variables are not empty
-
-Func ConvertInternalExternArea()
 	Local $x, $y
 
 	; Update External coord.
@@ -157,8 +131,8 @@ Func ConvertInternalExternArea()
 EndFunc   ;==>ConvertInternalExternArea
 
 Func CheckAttackLocation(ByRef $iX, ByRef $iY)
-	If $iY > $DeployableLRTB[3] Then
-		$iY = $DeployableLRTB[3]
+	If $iY > $g_aiDeployableLRTB[3] Then
+		$iY = $g_aiDeployableLRTB[3]
 		Return False
 	EndIf
 
@@ -746,6 +720,27 @@ Func Algorithm_AttackCSV($testattack = False, $captureredarea = True)
 		SetDebugLog("> " & $g_sBldgNames[$eBldgAirDefense] & " detection not needed, skipping", $COLOR_DEBUG)
 	EndIf
 
+	; 12.1 - Clan Castle ------------------------------------------------------------------------
+
+	$g_aiCSVClanCastlePos = "" ; reset location array?
+
+	If $g_bCSVLocateClanCastle Then
+		If Not _ObjSearch($g_oBldgAttackInfo, $eBldgClanCastle & "_LOCATION") Then
+			$aResult = GetLocationBuilding($eBldgClanCastle, $g_iSearchTH, False)
+			If $aResult = -1 Then SetLog("Monkey ate bad banana: " & "GetLocationBuilding " & $g_sBldgNames[$eBldgClanCastle], $COLOR_ERROR)
+		EndIf
+		$aResult = _ObjGetValue($g_oBldgAttackInfo, $eBldgClanCastle & "_LOCATION")
+		If @error Then
+			_ObjErrMsg("_ObjGetValue " & $g_sBldgNames[$eBldgClanCastle] & " _LOCATION", @error) ; Log errors
+			SetLog("> " & $g_sBldgNames[$eBldgClanCastle] & " location not in dictionary", $COLOR_WARNING)
+		Else
+			If IsArray($aResult) Then $g_aiCSVClanCastlePos = $aResult
+		EndIf
+	Else
+		SetDebugLog("> " & $g_sBldgNames[$eBldgClanCastle] & " detection not needed, skipping", $COLOR_DEBUG)
+	EndIf
+
+
 	; Calculate main attack side
 	ParseAttackCSV_MainSide()
 
@@ -941,6 +936,8 @@ Func _MakeTargetDropPoints($side, $target, $addtiles, $building)
 			$BuildingEnum = $eInternalWall
 		Case "SCATTER"
 			$BuildingEnum = $eBldgScatter
+		Case "CLANCASTLE"
+			$BuildingEnum = $eBldgClanCastle
 		Case Else
 			SetLog("Defense name not understood", $COLOR_ERROR) ; impossible error as value is checked earlier
 			SetError(1, 0, "")

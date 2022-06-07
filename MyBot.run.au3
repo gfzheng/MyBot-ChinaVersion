@@ -768,7 +768,7 @@ Func runBot() ;Bot that runs everything in order
 			If _Sleep($DELAYRUNBOT5) Then Return
 			checkMainScreen(False)
 			If $g_bRestart Then ContinueLoop
-			Local $aRndFuncList = ['LabCheck', 'Collect', 'CheckTombs', 'CleanYard', 'CollectAchievements', 'CollectFreeMagicItems', 'DailyChallenge', 'BoostSuperTroop', 'PetCheck', 'BBClanGames']
+			Local $aRndFuncList = ['LabCheck', 'Collect', 'CheckTombs', 'CleanYard', 'CollectAchievements', 'CollectFreeMagicItems', 'DailyChallenge', 'BoostSuperTroop', 'PetCheck', 'BBClanGames', 'CollectForge']
 			_ArrayShuffle($aRndFuncList)
 			For $Index In $aRndFuncList
 				If Not $g_bRunState Then Return
@@ -902,6 +902,7 @@ Func _Idle() ;Sequence that runs until Full Army
 
 	Local $TimeIdle = 0 ;In Seconds
 	If $g_bDebugSetlog Then SetDebugLog("Func Idle ", $COLOR_DEBUG)
+	SetLog("Func Idle ", $COLOR_DEBUG)
 
 	While $g_bIsFullArmywithHeroesAndSpells = False
 
@@ -1245,6 +1246,10 @@ Func __RunFunction($action)
 		Case "CollectFreeMagicItems"
 			CollectFreeMagicItems()
 			_Sleep($DELAYRUNBOT3)
+
+		Case "CollectForge"
+			CollectForge()
+			_Sleep($DELAYRUNBOT1)
 
 		Case "BBClanGames"
 			BBClanGames()
