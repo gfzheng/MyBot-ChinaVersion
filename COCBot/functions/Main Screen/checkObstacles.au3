@@ -1,3 +1,29 @@
+Func LoginWithQQ($sQQNum, $sPassword)
+	SetLog("Login with QQ No." & $sQQNum, $COLOR_INFO)
+	PureClick(188,566, 1, 0, "Click Agree")
+	_Sleep(1000, True, False)
+	SetLog("Try QQ Login!", $COLOR_INFO)
+	PureClick(512,521, 1, 0, "Click QQ Login")
+	_Sleep(5000, True, False)
+	;SetLog("Try QQ Login!", $COLOR_INFO)
+	PureClick(72,148, 1, 0, "Click password field.")
+	_Sleep(3000, True, False)
+	PureClick(72,148, 1, 0, "Click password field.")
+	_Sleep(2000, True, False)
+	SendText($sPassword)
+	_Sleep(2000, True, False)
+	PureClick(428,224, 1, 0, "Click Login.")
+EndFunc	;==>LoginWithQQ
+
+Func LoginWithWechat()
+	SetLog("Login with Wechat.", $COLOR_INFO)
+	PureClick(188,566, 1, 0, "Click Agree")
+	_Sleep(1000, True, False)
+	SetLog("Try Wechat Login!", $COLOR_INFO)
+	PureClick(350,525, 1, 0, "Click Wechat Login")
+	_Sleep(3000, True, False)
+EndFunc	;==>LoginWithWechat
+
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........: checkObstacles
 ; Description ...: Checks whether something is blocking the pixel for mainscreen and tries to unblock
@@ -26,6 +52,21 @@ Func checkObstacles($bBuilderBase = Default) ;Checks if something is in the way 
 		SetLog("Found Switch Account dialog!", $COLOR_INFO)
 		PureClick(383, 375 + $g_iMidOffsetY, 1, 0, "Click Cancel")
 	EndIf
+
+	;SetLog("village name " & $g_sProfileCurrentName, $COLOR_DEBUG)
+	If $g_sAndroidGameDistributor = "tencent" Then
+	    SetLog("it is tencent game " & $g_sAndroidGameDistributor, $COLOR_DEBUG)
+	    Local $bTencentLogin = _ColorCheck(_GetPixelColor(458, 523), Hex(0x5A5A5A, 6), 1) And _ColorCheck(_GetPixelColor(512, 521), Hex(0x151515, 6), 1) And _ColorCheck(_GetPixelColor(188, 566), Hex(0xC3BAAC, 6), 1)
+	    If $bTencentLogin Then
+		    SetLog("Found Tencent Login!", $COLOR_INFO)
+			IF StringLeft($g_sProfileCurrentName,2) = "wc" Then
+				LoginWithWechat()
+			Else
+				;这里换成自己的QQ号码和密码！guifeng
+	        	LoginWithQQ("your qq number", "yourpass")
+			EndIf
+	    EndIf
+    EndIf
 
 	Local $wasForce = OcrForceCaptureRegion(False)
 	$iRecursive += 1
