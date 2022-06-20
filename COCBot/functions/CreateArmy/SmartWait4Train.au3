@@ -1,4 +1,11 @@
 Func SwitchProfile()
+	If $g_sAndroidGameDistributor = "tencent" Then
+		SetLog("exit login tencent first",$COLOR_ACTION)
+		PureClick(811,585, 1, 0, "Click Option")
+		_Sleep(2000, True, False)
+		PureClick(325,227, 1, 0, "Click Logout")
+		_Sleep(2000, True, False)
+	EndIf
 	BotStop()
 	SetLog("going to close coc",$COLOR_ACTION)
 	If _Sleep(3000,True,False) Then Return
